@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyNavbar from "./navbar";
 import { useNavigate } from "react-router-dom";
 import Footer from "./footer";
+import axios from "axios";
 
 const Register = () => {
   const [confirmpassword, setConfirmpassword] = useState("");
@@ -13,19 +14,43 @@ const Register = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const [userdetails,setUserDetails]= useState([])
+  useEffect(() => {
+    // Fetch all products
+    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/user`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          setUserDetails(res.data)
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching all products:", error);
+      });
+    },[])
 
   const handleInput = (event) => {
     setValues((prev) => ({
       ...prev,
-      [event.target.name]: [event.target.value],
+      [event.target.name]: event.target.value,
     }));
   };
+  
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (values.password[0] === confirmpassword) {
-      navigate("/emailverification", { state: { values } });
-    } else {
-      alert("Passwords do not match");
+    const emails = userdetails.map(item => item.email);
+    const phonenumber= userdetails.map(item=>item.phone)
+
+    if (emails.some(email => email === values.email)) {
+      alert('email already registered')
+    } else if (phonenumber.some(phoneArray => phoneArray.toString() === values.phone)) {
+      alert('phone already exists')
+      } 
+    else{
+      if (values.password === confirmpassword) {
+        navigate("/emailverification", { state: { values } });
+      } else {
+        alert("Passwords do not match");
+      }
     }
   };
 

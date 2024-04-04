@@ -254,7 +254,7 @@ const MyNavbar = () => {
                 >
                   <Link
                     className="nav-link"
-                    to="/jewelry"
+                    to="/jewellery"
                     id="navbarDropdownKids"
                     role="button"
                     aria-haspopup="true"
@@ -267,16 +267,16 @@ const MyNavbar = () => {
                     aria-labelledby="navbarDropdownKids"
                     ref={jewelryDropdownRef}
                   >
-                    <Link className="dropdown-item" to="/necklaceschains">
+                    <Link className="dropdown-item" to="/Necklaces/chains">
                     NecklacesChains
                     </Link>
-                    <Link className="dropdown-item" to="/braceletsbangles">
+                    <Link className="dropdown-item" to="/Bracelets/bangles">
                     BraceletsBangles
                       </Link>
-                      <Link className="dropdown-item" to="/earrings">
+                      <Link className="dropdown-item" to="/Earrings">
                       Earrings
                       </Link>
-                      <Link className="dropdown-item" to="/rings">
+                      <Link className="dropdown-item" to="/Rings">
                        Rings
                       </Link>
                   </div>

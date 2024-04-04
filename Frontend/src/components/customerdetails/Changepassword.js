@@ -1,10 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MyNavbar from "../navbar";
 import Customermenu from "./Customermenu";
 import Footer from "../footer";
 import Customerbanner from "./Customerbanner";
+import axios from "axios";
 
 export default function Changepassword() {
+
+  const [userdetails,setUserDetails]= useState([])
+  const [values,setValues]= useState({
+     oldpassword:'',
+     newpassword:'',
+     confirmpassword:''
+  })
+
+  const handlechange = (event) => {
+    setValues((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  }
+    
+  useEffect(() => {
+    // Fetch all products
+    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/user`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          const userid = sessionStorage.getItem("user-token");
+          setUserDetails(res.data.filter((item)=>item.user_id.toString() === userid))
+        }
+
+      })
+      .catch((error) => {
+        console.log("Error fetching all products:", error);
+      });
+    },[])
+
+    const handleChangePassword = () => {
+        if (values.oldpassword === userdetails[0].password) {
+        if (values.newpassword === values.confirmpassword) {
+          const updatedUser = {email:userdetails[0].email, password: values.newpassword };
+          axios
+            .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updateuser/`, updatedUser)
+            .then((res) => {
+              console.log("Password updated successfully:", res.data);
+              window.location.reload(false);
+              // Optionally, you can clear the input fields or show a success message here
+            })
+            .catch((error) => {
+              console.log("Error updating password:", error);
+            });
+        } else {
+          console.log("Passwords do not match.");
+        }
+      } else {
+        console.log("Old password is incorrect.");
+      }
+    };
+
   return (
     <div className="fullscreen">
       <MyNavbar />
@@ -28,7 +81,9 @@ export default function Changepassword() {
                     name="oldpassword"
                     id="oldpassword"
                     placeholder="Old Password"
+                    value={values.oldpassword}
                     className="form-control"
+                    onChange={handlechange}
                   />
                   &nbsp;<span className="text-danger fs-4">*</span>
                 </div>
@@ -43,7 +98,9 @@ export default function Changepassword() {
                     name="newpassword"
                     id="newpassword"
                     placeholder="New Password"
+                    value={values.newpassword}
                     className="form-control"
+                    onChange={handlechange}
                     required
                   />
                   &nbsp;<span className="text-danger fs-4">*</span>
@@ -59,14 +116,16 @@ export default function Changepassword() {
                     name="confirmpassword"
                     id="confirmpassword"
                     placeholder="Confirm Password"
+                    value={values.confirmpassword}
                     className="form-control"
+                    onChange={handlechange}
                     required
                   />
                   &nbsp;<span className="text-danger fs-4">*</span>
                 </div>
               </div>
             </div>
-            <button type="button" className="btn btn-success mt-3 mb-5">
+            <button type="button" className="btn btn-success mt-3 mb-5" onClick={handleChangePassword}>
               Change Password
             </button>
           </form>

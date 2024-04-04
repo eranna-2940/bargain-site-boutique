@@ -25,6 +25,7 @@ export default function Addnewproduct() {
   const [customAttributes, setCustomAttributes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [files, setFiles] = useState([]);
+  // const [errors, setErrors] = useState({});
   
 
 
@@ -60,7 +61,7 @@ export default function Addnewproduct() {
         setCategories(["Necklaces/Chains","Bracelets/Bangles","Earrings","Rings"]);
       }
       else if(event.target.value === "books"){
-        setCategories(["Fiction","Drama","Fantasy","Horror"]); 
+        setCategories(["Fantasy","Horror","Fiction","Drama"]); 
       }
     }
   }
@@ -87,6 +88,22 @@ export default function Addnewproduct() {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
+// Create a copy of the values object
+const updatedValues = { ...values };
+// console.log(updatedValues)
+
+// Check if the product type is 'jewellery' or 'books'
+if (values.producttype === "jewellery") {
+  // Set size to 'NA' for jewellery
+  updatedValues.size = "NA";
+} else if (values.producttype === "books") {
+  // Set all fields to 'NA' for books
+  updatedValues.color = "NA";
+  updatedValues.alteration = "NA";
+  updatedValues.size = "NA";
+  updatedValues.measurements = "NA";
+  updatedValues.worn = "NA";
+}
     const formData = new FormData();
   
     // Append all files to formData
@@ -95,8 +112,8 @@ export default function Addnewproduct() {
     }
   
     // Append other form data
-    for (const key in values) {
-      formData.append(key, values[key]);
+    for (const key in updatedValues) {
+      formData.append(key, updatedValues[key]);
     }
   
     // Append custom attributes
@@ -105,6 +122,7 @@ export default function Addnewproduct() {
     });
   
     try {
+      console.log(formData)
       const response = await axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/addproducts`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -115,6 +133,7 @@ export default function Addnewproduct() {
         alert("Error while adding product. Please try again filling all the fields");
       } else {
         alert("Product added successfully");
+       
         window.location.reload(false);
       }
     } catch (error) {
@@ -122,6 +141,19 @@ export default function Addnewproduct() {
       // Handle error here
     }
   };
+  // const validateForm = () => {
+  //   let errors = {};
+  //   // Validate each field and set error messages accordingly
+  //   if (!values.productname.trim()) {
+  //     errors.productname = 'Product name is required.';
+  //   }
+  //   // if (!formData.productname) {
+  //   //   errors.productname = 'Please enter a product name.';
+  //   // }
+  //   // Add more validation for other fields as needed
+
+  //   return errors;
+  // };
   
 
   const attributeOptions = [
@@ -228,6 +260,7 @@ export default function Addnewproduct() {
                         />
                          <span className="text-danger fs-4"> &nbsp;*</span>
                          </div>
+                       
                       </div>
                       <div className="mb-3">
                         <label
@@ -258,10 +291,11 @@ export default function Addnewproduct() {
                         </label>
                         <div className="d-flex">
                         
-                          <input type="file" className="form-control" multiple onChange={handleFile} name="productimageurl" id="productimageurl"/>
+                          <input type="file" className="form-control" multiple onChange={handleFile} name="productimageurl" id="productimageurl" title="gfvh bjnk,mgcvn bm" required/>
                           <span className="text-danger fs-4"> &nbsp;*</span>
                           </div>
                       </div>
+                      {values.producttype !== "books" && (
                       <div className="mb-3">
                         <label htmlFor="color"
                          className="form-label text-primary">
@@ -281,6 +315,7 @@ export default function Addnewproduct() {
                         <span className="text-danger fs-4"> &nbsp;*</span>
                         </div>
                      </div>
+                      )}
                      <div className="mb-3">
                        <label htmlFor="location" className="form-label text-primary">
                          Location
@@ -299,6 +334,7 @@ export default function Addnewproduct() {
                         <span className="text-danger fs-4"> &nbsp;*</span>
                         </div>
                      </div>
+                     {values.producttype !== "books" && (
                      <div className="mb-3">
                        <label htmlFor="alteration" className="form-label text-primary">
                          Alteration
@@ -329,6 +365,8 @@ export default function Addnewproduct() {
                         <span className="text-danger fs-4"> &nbsp;*</span>
                         </div>
                      </div>
+                     )}
+                     {values.producttype !== "jewellery" && values.producttype !== "books"  && (
                      <div className="mb-3">
                        <label htmlFor="size" className="form-label text-primary">
                          Size
@@ -352,6 +390,8 @@ export default function Addnewproduct() {
                         </div>
                        
                      </div>
+                      )}
+                       {values.producttype !== "books" && (
                      <div className="mb-3">
                        <label
                          htmlFor="measurements"
@@ -373,9 +413,11 @@ export default function Addnewproduct() {
                         <span className="text-danger fs-4"> &nbsp;*</span>
                         </div>
                      </div>
+                       )}
+                        {values.producttype !== "books" && (
                      <div className="mb-3">
                        <label htmlFor="worn" className="form-label text-primary">
-                         Worn
+                        Times Worn
                        </label>
                        <div className="d-flex">
                        <input
@@ -391,6 +433,7 @@ export default function Addnewproduct() {
                         <span className="text-danger fs-4"> &nbsp;*</span>
                         </div>
                      </div>
+                        )}
                      <div className="mb-3">
                        <label htmlFor="price" className="form-label text-primary">
                          Price
@@ -429,6 +472,7 @@ export default function Addnewproduct() {
                          />
                        </div>
                      ))}
+                      {values.producttype !== "books" && (
                      <div className="mb-3">
                        <button
                          type="button"
@@ -468,6 +512,7 @@ export default function Addnewproduct() {
                          </div>
                        </div>
                      </div>
+                      )}
                      <div className="text-center">
                        <button
                          type="submit"

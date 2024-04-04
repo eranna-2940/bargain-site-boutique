@@ -47,7 +47,7 @@ const BraceletsBangles = () => {
             <i className="bi bi-house-fill"></i>
           </Link>
           &nbsp; /{" "}
-          <Link to="/jewelry" className="text-decoration-none text-dark">
+          <Link to="/jewellery" className="text-decoration-none text-dark">
             Jewelery
           </Link>{" "} 
           /&nbsp; BraceletsBangles

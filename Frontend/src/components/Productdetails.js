@@ -56,7 +56,7 @@ export default function Productdetails() {
         console.log(err);
       });
     alert("Product added to the store successfully");
-    window.location.href = "/bargain_db/";
+    window.location.href = "/bargain-site-boutique/";
   };
   const handleRejectClick = () => {
     const reason = prompt('Please enter the reason for rejection:');
@@ -74,7 +74,7 @@ export default function Productdetails() {
       // The user clicked Cancel
       console.log('Rejection cancelled');
     }
-    window.location.href = "/bargain_db/";
+    window.location.href = "/bargain-site-boutique/";
   };
 
   const { addToCart, addToWishlist, cartItems } = useCart();

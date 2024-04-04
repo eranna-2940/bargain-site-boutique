@@ -11,6 +11,7 @@ export default function Emailverification() {
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
+  const [otpsent,setOtpSent]=useState(false)
 
   const navigate = useNavigate();
 
@@ -61,6 +62,8 @@ export default function Emailverification() {
         if (res.status === 200) {
           setShowVerification(true);
           setErrorMessage("");
+          setOtpSent(true)
+
         } else {
           setErrorMessage("Email not exist");
         }
@@ -93,7 +96,7 @@ export default function Emailverification() {
               />
             </div>
             <div className="col-auto">
-              <button className="btn btn-primary" onClick={sendOTP}>
+              <button className="btn btn-primary" onClick={sendOTP}  disabled={otpsent}>
                 Send OTP
               </button>
             </div>

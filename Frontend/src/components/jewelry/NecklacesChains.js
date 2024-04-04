@@ -30,6 +30,7 @@ const NecklacesChains = () => {
       })
       .catch((err) => console.log(err));
   }, []);
+  
   useEffect(() => {
     setCurrentPage(1);
     setViewRowIndex(null);

@@ -71,7 +71,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter basename="bargain_db">
+      <BrowserRouter basename="bargain-site-boutique">
         <Scrolltotop />
         <Routes>
           {/* Login routes */}
@@ -154,11 +154,11 @@ function App() {
           <Route path="boy" element={<Boy />}></Route>
 
           {/* Jewelery components routes */}
-          <Route path="jewelry" element={<Jewelryallcollection />}></Route>
-          <Route path="necklaceschains" element={<NecklacesChains />}></Route>
-          <Route path="braceletsbangles" element={<BraceletsBangles />}></Route>
-          <Route path="earrings" element={<Earrings />}></Route>
-          <Route path="rings" element={<Rings />}></Route>
+          <Route path="jewellery" element={<Jewelryallcollection />}></Route>
+          <Route path="Necklaces/Chains" element={<NecklacesChains />}></Route>
+          <Route path="Bracelets/Bangles" element={<BraceletsBangles />}></Route>
+          <Route path="Earrings" element={<Earrings />}></Route>
+          <Route path="Rings" element={<Rings />}></Route>
 
 
           {/* Books components routes */}
