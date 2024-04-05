@@ -3,15 +3,16 @@ import Sellernavbar from "./Sellernavbar";
 import Sellermenu from "./Sellermenu";
 import Sellerfooter from "./Sellerfooter";
 import Sellerpagination from "./sellerpagination";
+import axios from "axios";
 // import { Link } from "react-router-dom";
 
 export default function Sellerorders() {
   // eslint-disable-next-line no-unused-vars
-  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [orders,setOrders]=useState([])
   const [pageSize, setPageSize] = useState(6);
   const [currentPage, setCurrentPage] = useState(1);
   // eslint-disable-next-line no-unused-vars
-  const [filteredProducts, setFilteredProducts] = useState([]);
   // eslint-disable-next-line no-unused-vars
   const [viewRowIndex, setViewRowIndex] = useState(null);
 
@@ -19,12 +20,87 @@ export default function Sellerorders() {
     setCurrentPage(1);
     setViewRowIndex(null);
   }, [pageSize]);
+  useEffect(() => {
+    // Fetch all products
+    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/allproducts`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          setAllProducts(res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching all products:", error);
+      });
+
+    // Fetch orders
+    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updatepayment`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          setOrders(res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching orders:", error);
+      });
+  }, []);
+  const [userdetails,setUserDetails]= useState([])
+
+  useEffect(() => {
+    // Fetch all products
+    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/user`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          const userid = sessionStorage.getItem("user-token");
+          setUserDetails(res.data.filter((item)=>item.user_id.toString() === userid))
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching all products:", error);
+      });
+    },[])
+  // const userId = parseInt(sessionStorage.getItem("user-token"));  
+
+  // // Filter products that have orders
+  // const filteredProducts = allProducts.filter((product) => {
+  //   const order = orders.find((order) => order.product_id === product.id && order.buyer_id === userId);
+  //   return order;
+  // }).map((product) => {
+  //   const order = orders.find((order) => order.product_id === product.id && order.buyer_id === userId);
+  //   const userDetails = userdetails.find((user) => user.user_id === userId);
+    
+  //   return { 
+  //     ...product, 
+  //     paymentStatus: order.payment_status,
+  //     orderID: order.orderID,
+  //     customerName: userDetails ? userDetails.firstname : '' 
+  //   };
+  // });
+  const userId = parseInt(sessionStorage.getItem("user-token"));  
+
+// Filter products that have orders
+const filteredProducts = allProducts.map((product) => {
+  // Find orders corresponding to the product
+  const productOrders = orders.filter((order) => order.product_id === product.id && order.buyer_id === userId);
+  
+  // Map over product orders and create a new product object for each order
+  const mappedProducts = productOrders.map((order) => {
+    const userDetails = userdetails.find((user) => user.user_id === order.buyer_id);
+    return { 
+      ...product, 
+      paymentStatus: order.payment_status,
+      orderID: order.orderID,
+      customerName: userDetails ? userDetails.firstname + userDetails.lastname : ''
+    };
+  });
+
+  return mappedProducts;
+}).flat();
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   // eslint-disable-next-line no-unused-vars
   const tableData = filteredProducts.slice(startIndex, endIndex);
-
+  
   const handleChecked = (e) => {
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     if (e.currentTarget.checked) {
@@ -37,7 +113,7 @@ export default function Sellerorders() {
       }
     }
   };
-
+  
   return (
     <div className="">
       <Sellernavbar />
@@ -56,13 +132,12 @@ export default function Sellerorders() {
                   </button>
                 </Link> */}
               </div>
-
               <div className="border m-2">
                 <div className=" p-2 bg-light text-danger">
-                  <b>Order Payment Status, reflects if the buyer has successfully
+                {tableData.length > 0 ? (null):(<b>Order Payment Status, reflects if the buyer has successfully
                   paid for the order. This does not mean the Seller has been
                   paid. Seller will be paid, once the product has been shipped
-                  and buyer confirms receipt of the product</b>
+                  and buyer confirms receipt of the product</b>)}  
                 </div>
                 <div className="table-responsive p-3">
                   <table
@@ -157,32 +232,23 @@ export default function Sellerorders() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr role="row" className="">
-                        <td>No data available</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                      <tr>
-                        <td> row 2</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    </tbody>
+                  {tableData.map((product, index) => (
+                    <tr key={index}>
+                      <td></td>
+                      <td className="text-secondary">{product.name}</td>
+                      <td>{product.paymentStatus ? <span className="text-success" style={{fontWeight:'600'}}>SUCCESS</span> : ""}</td>
+                      <td>{product.customerName}</td>
+                      <td></td>
+                      <td>{product.orderID}</td>
+                      <td></td>
+                      <td><button className="btn btn-success">view</button></td>
+                    </tr>
+                  ))}
+                </tbody>
                   </table>
                 </div>
-
                 <Sellerpagination
-                  stateData={products}
+                  stateData={filteredProducts}
                   pageSize={pageSize}
                   setPageSize={setPageSize}
                   setViewRowIndex={setViewRowIndex}

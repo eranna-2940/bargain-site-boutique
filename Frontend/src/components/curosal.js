@@ -59,7 +59,7 @@ function Curosel() {
               </div>
             </div>
           </Link>
-          <Link to="/jewelry" className="text-decoration-none">
+          <Link to="/jewellery" className="text-decoration-none">
             <div className="custom-item">
               <div className="m-3 position-relative text-center carouselslide">
                 <img src={jeweleryurl} alt="engage pic" />

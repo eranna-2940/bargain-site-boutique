@@ -121,7 +121,7 @@ const MyNavbar = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/adminproducts`)
+      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/sellerproducts`)
       .then((res) => {
         console.log(res.data);
 

@@ -37,28 +37,36 @@ export default function Sellerproducts() {
   useEffect(() => {
     // Fetching all products
     axios
-      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/allproducts`)
+      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/sellerproducts`)
       .then((res) => {
         console.log(res.data);
         if (res.data !== "Fail" && res.data !== "Error") {
+            const rejectedProducts = res.data.filter(item => item.rejectedReason !== null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
 
           const approvedProducts = res.data.filter(item => item.accepted_by_admin === "true" && item.seller_id.toString() === userid);
-          // Fetching admin products (rejected)
-          axios
-            .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/adminproducts`)
-            .then((adminRes) => {
-              console.log(adminRes.data);
-              if (adminRes.data !== "Fail" && adminRes.data !== "Error") {
-                const rejectedProducts = adminRes.data.filter(item => item.rejectedReason !== null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
-                // Fetching pending products
-                const pendingProducts = adminRes.data.filter(item =>item.rejectedReason === null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
-                // Merge all products
-                const mergedProducts = [...approvedProducts, ...rejectedProducts, ...pendingProducts];
-                setProducts(mergedProducts);
-                setFilteredProducts(mergedProducts)
-              }
-            })
-            .catch((err) => console.log(err));
+           
+          const pendingProducts = res.data.filter(item =>item.rejectedReason === null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
+
+          const mergedProducts = [...approvedProducts, ...rejectedProducts, ...pendingProducts];
+           setFilteredProducts(mergedProducts)
+
+          // console.log(approvedProducts)
+          // // Fetching admin products (rejected)
+          // axios
+          //   .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/adminproducts`)
+          //   .then((adminRes) => {
+          //     console.log(adminRes.data);
+          //     if (adminRes.data !== "Fail" && adminRes.data !== "Error") {
+          //       const rejectedProducts = adminRes.data.filter(item => item.rejectedReason !== null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
+          //       // Fetching pending products
+          //       const pendingProducts = adminRes.data.filter(item =>item.rejectedReason === null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
+          //       // Merge all products
+          //       const mergedProducts = [...approvedProducts, ...rejectedProducts, ...pendingProducts];
+          //       setProducts(mergedProducts);
+          //       setFilteredProducts(mergedProducts)
+          //     }
+          //   })
+          //   .catch((err) => console.log(err));
         }
       })
       .catch((err) => console.log(err));

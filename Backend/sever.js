@@ -18,6 +18,7 @@ const {
   loginCheckQuery,
   adminLoginQuery,
   retrievingUsersQuery,
+  retrievingSellerProductsQuery,
   addUserQuery,
   updateUserQuery,
   retrievingSellersQuery,
@@ -331,6 +332,22 @@ app.post("/adminrejected", (req, res) => {
   });
 });
 // all products
+app.get("/sellerproducts", (req, res) => {
+  const sql = retrievingSellerProductsQuery;
+
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      return res.json("Error");
+    }
+    if (data.length > 0) {
+      return res.json(data);
+    } else {
+      return res.json("Fail");
+    }
+  });
+});
+
 app.get("/allproducts", (req, res) => {
   const sql = retrievingAllProductsQuery;
   const accepted = "true";
@@ -694,9 +711,6 @@ app.post("/saveBillingAddress", (req, res) => {
 
 app.get("/saveBillingAddress", (req, res) => {
   const sql = getbillingAddress;
-  
-  
-
   db.query(sql, (err, data) => {
     if (err) {
       return res.json("Error");
@@ -746,16 +760,35 @@ app.get("/saveShippingAddress", (req, res) => {
     }
   });
 });
+const generateCustomID = () => {
+  // Define characters and numbers to use in the ID
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
 
+  // Initialize empty ID string
+  let customID = 'Id';
+
+  // Generate four random characters
+
+
+  // Generate four random numbers
+  for (let i = 0; i < 4; i++) {
+    const randomIndex = Math.floor(Math.random() * numbers.length);
+    customID += numbers.charAt(randomIndex);
+  }
+
+  return customID;
+};
 
 
 app.post("/updatepayment", (req, res) => {
   const payment_status = req.body.payment_status;
   const token = parseInt(req.body.token); // Ensure that token is parsed as an integer
+  const orderID = generateCustomID();
 
   // Insert into orders table
   const insertOrderSql = paymentStatusQuery;
-  db.query(insertOrderSql, [req.body.product_id, payment_status, token], (err, result) => {
+  db.query(insertOrderSql, [req.body.product_id,payment_status, token,orderID,], (err, result) => {
     if (err) {
       console.error("Error inserting into orders table:", err);
       return res.status(500).json({ error: "Error updating payment status" });
@@ -873,7 +906,7 @@ app.get("/success", (req, res) => {
       } else {
         // console.log(JSON.stringify(payment));
         // res.send('Payment success!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        res.redirect(`${process.env.REACT_APP_HOST}3000/bargain_db/finalcheckoutpage`);
+        res.redirect(`${process.env.REACT_APP_HOST}3000/bargain-site-boutique/finalcheckoutpage`);
       }
     }
   );
@@ -882,7 +915,7 @@ app.get("/success", (req, res) => {
 app.get("/cancel", (req, res) => {
   // popup.alert({content : "Payment canceled."});
   // res.write("Hii");
-  res.redirect(`${process.env.REACT_APP_HOST}3000/bargain_db/`);
+  res.redirect(`${process.env.REACT_APP_HOST}3000/bargain-site-boutique/`);
 });
 
 app.post("/");

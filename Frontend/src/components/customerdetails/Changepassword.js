@@ -29,7 +29,6 @@ export default function Changepassword() {
           const userid = sessionStorage.getItem("user-token");
           setUserDetails(res.data.filter((item)=>item.user_id.toString() === userid))
         }
-
       })
       .catch((error) => {
         console.log("Error fetching all products:", error);
@@ -43,7 +42,7 @@ export default function Changepassword() {
           axios
             .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updateuser/`, updatedUser)
             .then((res) => {
-              console.log("Password updated successfully:", res.data);
+              alert("Password updated successfully:", res.data);
               window.location.reload(false);
               // Optionally, you can clear the input fields or show a success message here
             })
@@ -67,7 +66,6 @@ export default function Changepassword() {
         <div className="col-lg-3 col-xs-12 col-md-12 p-lg-4 p-2">
           <Customermenu />
         </div>
-
         <div className="col-xs-12 col-md-12 col-lg-9 p-lg-4 p-2">
           <form>
             <div>

@@ -94,6 +94,7 @@ const ordersproducts = `
     product_id INT NOT NULL,
     payment_status TINYINT(4) NULL,
     buyer_id INT NULL, 
+    orderID INT NULL,
     UNIQUE INDEX id_UNIQUE (id ASC));
 `
 
@@ -188,6 +189,7 @@ const addingSellerAccountQuery = "INSERT INTO selleraccount SET ?";
 const adminAcceptedProductsQuery = "select * from products WHERE `accepted_by_admin` = (?)";
 const adminRejectedProductsQuery = "UPDATE products SET rejectedReason = ? WHERE id = ?"
 const adminApprovalQuery = "UPDATE products SET accepted_by_admin = ? WHERE id = ?";
+const retrievingSellerProductsQuery = "select * from products";
 const retrievingAllProductsQuery = "select * from products WHERE `accepted_by_admin` = (?)";
 const retrievingWomenProductsQuery = "select * from products WHERE `product_type` = (?) AND `accepted_by_admin` = (?)";
 const retrievingKidsProductsQuery = "select * from products WHERE `product_type` = (?) AND `accepted_by_admin` = (?)";
@@ -205,7 +207,7 @@ const retrieveContactusQuery = "Select * from contact";
 const addContactusQuery = "INSERT INTO contact (`name`,`email`,`enquiry`) VALUES(?)";
 const addBillingAddress = `INSERT INTO billing_address (firstname, lastname, email, country, state, city, address1, address2, pincode, phone, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 const addShippingAddress = `INSERT INTO shipping_address (firstname, lastname, email, country, state, city, address1, address2, pincode, phone, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-const paymentStatusQuery = "INSERT INTO orders (product_id, payment_status, buyer_id) VALUES (?, ?, ?)";
+const paymentStatusQuery = "INSERT INTO orders (product_id, payment_status, buyer_id, orderID) VALUES (?, ?, ?,?)";
 const deleteProductsQuery = "DELETE FROM  products WHERE id=?";
 const deletecartitemQuery = "DELETE FROM cart WHERE userid = ? AND EXISTS (SELECT 1 FROM orders WHERE buyer_id = ?)"
 const getbillingAddress= "Select * from billing_address"
@@ -234,6 +236,7 @@ module.exports = {
   addingSellerAccountQuery,
   adminAcceptedProductsQuery,
   adminRejectedProductsQuery,
+  retrievingSellerProductsQuery,
   adminApprovalQuery,
   retrievingAllProductsQuery,
   retrievingWomenProductsQuery,

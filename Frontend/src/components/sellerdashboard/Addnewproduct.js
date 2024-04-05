@@ -38,9 +38,7 @@ export default function Addnewproduct() {
   // const formData = new FormData();
 
   const handleFile = (e) => {
-    setFiles([ ...e.target.files]); // Append newly selected files to existing files
-  
-    // No need to handle formData here
+    setFiles([ ...e.target.files]); 
   };
   
 
@@ -58,7 +56,7 @@ export default function Addnewproduct() {
         setCategories(["girl","boy"]);
       }
       else if(event.target.value === "jewellery"){
-        setCategories(["Necklaces/Chains","Bracelets/Bangles","Earrings","Rings"]);
+        setCategories(["Necklaces/Chains","Bracelets/Bangles","Earrings","Rings"])
       }
       else if(event.target.value === "books"){
         setCategories(["Fantasy","Horror","Fiction","Drama"]); 
@@ -198,27 +196,27 @@ if (values.producttype === "jewellery") {
                 <div className="row justify-content-center">
                   <div className="col-xs-12 col-sm-8 col-md-9z col-lg-6">
                     <form className="mb-4" onSubmit={handleSubmit}>
-                      <div className="mb-3">
-                        <label htmlFor="producttype" className="form-label">
-                          Product Type
-                        </label>
-                        <div className="d-flex">
-                        <select
-                          id="producttype"
-                          name="producttype"
-                          className="form-select"
-                          onChange={handleProducttype}
-                          required
-                        >
-                          <option value="">Select Product Type</option>
-                          <option value="women">Women</option>
-                          <option value="kids">Kids</option>
-                          <option value="jewellery">Jewellery</option>
-                          <option value="books">Books</option>
-                        </select>
-                        <span className="text-danger fs-4"> &nbsp;*</span>
-                        </div>
-                      </div>
+                    <div className="mb-3">
+    <label htmlFor="producttype" className="form-label">
+      Product Type
+    </label>
+    <div className="d-flex">
+      <select
+        id="producttype"
+        name="producttype"
+        className="form-select"
+        onChange={handleProducttype}
+        required
+      >
+        <option value="">Select Product Type</option>
+        <option value="women">Women</option>
+        <option value="kids">Kids</option>
+        <option value="jewellery">Jewellery</option>
+        <option value="books">Books</option>
+      </select>
+      <span className="text-danger fs-4"> &nbsp;*</span>
+    </div>
+  </div>
                       <div className="mb-3">
                         <label htmlFor="category" className="form-label text-primary">
                           Product Category

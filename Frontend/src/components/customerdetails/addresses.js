@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MyNavbar from "../navbar";
 import Customermenu from "./Customermenu";
-import { Link, useSearchParams } from "react-router-dom";
+// import { Link, useSearchParams } from "react-router-dom";
 import Footer from "../footer";
 import Customerbanner from "./Customerbanner";
 import axios from "axios";
