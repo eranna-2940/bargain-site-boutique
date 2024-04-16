@@ -269,7 +269,7 @@ const Checkout = () => {
               <h5>Shipping Addresses</h5>
               {shippingaddress.map((address, index) => (
                 <div key={`shipping_${index}`} className={`shipping-address border rounded p-3 ${selectedShippingAddress === address ? 'selected' : ''}`} style={{ maxHeight: "150px", overflowY: "auto" }} onClick={() => handleDivClick('shipping', index)}>
-                  <h6><input type="radio" name="shippingAddress" className="me-2" checked={selectedShippingAddress === address} onChange={() => {}} />Shipping Address {index + 1}</h6>
+                  <h6><input type="radio" name="shippingAddress" className="me-2" checked={selectedShippingAddress === address} onChange={() => {}} required/>Shipping Address {index + 1}</h6>
                   <p>{address.firstname} {address.lastname}</p>
                   <p>Email: {address.email}</p>
                   <p>Phone: {address.phone}</p>
@@ -286,7 +286,7 @@ const Checkout = () => {
               <h5>Billing Addresses</h5>
               {billingaddress.map((address, index) => (
                 <div key={`billing_${index}`} className={`billing-address border rounded p-3 ${selectedBillingAddress === address ? 'selected' : ''}`} style={{ maxHeight: "150px", overflowY: "auto" }} onClick={() => handleDivClick('billing', index)}>
-                  <h6><input type="radio" name="billingAddress" className="me-2" checked={selectedBillingAddress === address} onChange={() => {}} />Billing Address {index + 1}</h6>
+                  <h6><input type="radio" name="billingAddress" className="me-2" checked={selectedBillingAddress === address} onChange={() => {}} required/>Billing Address {index + 1}</h6>
                   {/* Display address details */}
                   <p>{address.firstname} {address.lastname}</p>
                   <p>Email: {address.email}</p>
@@ -454,14 +454,16 @@ const Checkout = () => {
                     />
                   </div>
                 </div>
-                <button
-                  className="btn btn-primary mt-3"
-                  onClick={handleContinue}
-                >
-                  {" "}
-                  <i class="bi bi-arrow-right-square me-1 me-1"></i>
-                  Continue
-                </button>
+                <div className="col-12 d-flex justify-content-between p-5">
+                <button className="btn btn-secondary mt-3" onClick={handleBack}>
+                <i class="bi bi-arrow-left-square"></i> Back
+        </button>
+        <button className="btn btn-primary mt-3 me-3" onClick={handleClick}>
+          <i className="bi bi-arrow-right-square me-1"></i>
+          Continue
+        </button>
+       
+      </div>
               </>
             )}
   </div>

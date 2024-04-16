@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MyNavbar from "./navbar";
 import Footer from "./footer";
@@ -7,7 +7,7 @@ import { useData } from "./CartContext";
 
 const Login = () => {
   sessionStorage.clear();
-  const { setUserData, cartItems } = useData();
+  const { setUserData, cartItems} = useData();
   // eslint-disable-next-line no-unused-vars
   const [values, setValues] = useState({
     username: "",
@@ -26,6 +26,34 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/allproducts`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          setAllProducts(res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching data:", error);
+      });
+  }, []);
+  const [cartproducts,setCartProducts]=useState([])
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/addcart`)
+      .then((res) => {
+        if (res.data !== "Fail" && res.data !== "Error") {
+          setCartProducts(res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error fetching data:", error);
+      });
+  }, []);
+//  console.log(cartproducts)
   const handleSubmit = (e) => {
     e.preventDefault();
     var url = "";
@@ -44,6 +72,7 @@ const Login = () => {
           if (url === 'user') {
             token = data.user_id;
             sessionStorage.setItem("token", "user");
+
           } else if (url === 'admin') {
             token = data.admin_id;
             sessionStorage.setItem("token", "admin");
@@ -54,14 +83,31 @@ const Login = () => {
           }
           sessionStorage.removeItem("user-token");
           sessionStorage.setItem("user-token", token);
-          axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/editcart`, { cartItems, token })
-            .then((res) => {
-              console.log(res)
-            })
-            .catch((err) => {
-              console.log(err)
-            });
-          navigate("/");
+          const filtered = cartItems.map((item)=>item.seller_id)
+          const isProductInCart = cartItems.length > 0 && cartproducts.some(item => {
+            // Check if the product exists in the cart with the same userid
+            if (sessionStorage.getItem('user-token')) {
+                return allProducts.some(product => product.id === item.product_id && item.userid && item.userid.toString() === sessionStorage.getItem('user-token'));
+            } else {
+                // Allow updating the cart only if the product does not already exist
+                return !allProducts.some(product => product.id === item.product_id && item.userid !== null);
+            }
+        });
+        // console.log(isProductInCart)
+        if (filtered.toString()=== sessionStorage.getItem("user-token")) {
+            alert('You are the seller of this product');
+          }else if(isProductInCart){
+            alert('product already exist in your cart')
+          } else {
+            axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/editcart`, { cartItems, token: sessionStorage.getItem("user-token") })
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+              navigate("/");
+          }
         } else {
           alert("Invalid Username or Password");
           window.location.reload(false);
@@ -70,6 +116,8 @@ const Login = () => {
       .catch((err) => console.log(err));
   };
 
+  // console.log(cartItems)
+  
   const toggleAdditionalContent = () => {
     if (showAdditionalContent) {
       setShowAdditionalContent(false);

@@ -83,7 +83,9 @@ const Product = (props) => {
           </p>
         </div>
         <div className="card-footer d-flex flex-wrap justify-content-center">
-          <button
+        {props.product.quantity > 0 ?(
+          <>
+         <button
             className="btn btn-secondary ms-1 me-1"
             onClick={handleAddToCart}
           >
@@ -95,6 +97,9 @@ const Product = (props) => {
           >
             <i className="bi bi-heart-fill" />
           </button>
+          </>
+        ):(<><h5 className="text-danger" style={{fontWeight:'800'}}>Out of Stock</h5></>)}
+         
         </div>
       </div>
     </div>

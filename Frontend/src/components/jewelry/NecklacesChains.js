@@ -24,7 +24,7 @@ const NecklacesChains = () => {
           const filterProducts = res.data.filter(
             (item) => item.category === "Necklaces/Chains"
           );
-          setProducts(filterProducts);
+          setProducts(filterProducts)
           setFilteredProducts(filterProducts);
         }
       })

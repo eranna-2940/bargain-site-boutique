@@ -88,12 +88,11 @@ const Kidsallproducts = () => {
       <div className="d-lg-flex justify-content-around p-2 ps-lg-5 pe-lg-5">
         <div className="col-lg-2 col-xs-12 col-md-12">
           <Menu />
+          <Filter products={products} onFilter={handleFilter} />
         </div>
-
         <div className="col-xs-12 col-md-12 col-lg-10 ps-lg-3">
           <Filterdisplaynav pageSize={pageSize} setPageSize={setPageSize} />
 
-          <Filter products={products} onFilter={handleFilter} />
           <div className="d-flex flex-wrap  justify-content-around gap-3">
             {tableData.length > 0 ? (
               tableData.map((product, index) => (

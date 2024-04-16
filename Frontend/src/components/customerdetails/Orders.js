@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyNavbar from "../navbar";
 import Customermenu from "./Customermenu";
 import Footer from "../footer";
@@ -6,14 +6,15 @@ import Customerbanner from "./Customerbanner";
 import axios from "axios";
 
 export default function Orders() {
-
   const [allProducts, setAllProducts] = useState([]);
-  const [orders,setOrders]=useState([])
+  const [orders, setOrders] = useState([]);
 
-  
   useEffect(() => {
     // Fetch all products
-    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/allproducts`)
+    axios
+      .get(
+        `${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/allproducts`
+      )
       .then((res) => {
         if (res.data !== "Fail" && res.data !== "Error") {
           setAllProducts(res.data);
@@ -24,7 +25,10 @@ export default function Orders() {
       });
 
     // Fetch orders
-    axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updatepayment`)
+    axios
+      .get(
+        `${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updatepayment`
+      )
       .then((res) => {
         if (res.data !== "Fail" && res.data !== "Error") {
           setOrders(res.data);
@@ -34,57 +38,99 @@ export default function Orders() {
         console.log("Error fetching orders:", error);
       });
   }, []);
-  const userId = parseInt(sessionStorage.getItem("user-token")); 
+  const userId = parseInt(sessionStorage.getItem("user-token"));
 
   const filteredProducts = allProducts.filter((product) =>
-    orders.some((order) => order.buyer_id === userId && order.product_id === product.id)
+    orders.some(
+      (order) => order.buyer_id === userId && order.product_id === product.id
+    )
   );
-  console.log(filteredProducts)
-// console.log(filteredProducts)
+  console.log(filteredProducts);
+  // console.log(filteredProducts)
+  const handlecancel = (id, updatedQuantity) => {
+    axios
+      .post(
+        `${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updateproducts`,
+        {
+          product_id: parseInt(id),
+          quantity: updatedQuantity,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+      });
+    axios
+      .delete(
+        `${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updateorder/${id}`,
+        {
+          data: {
+            userID: userId,
+          },
+        }
+      )
+      .then((res) => {
+        alert("Are you sure order was cancelled");
+        window.location.reload(false);
+      })
+      .catch((error) => {
+        console.error("Error updating product quantity:", error);
+      });
+  };
   return (
     <div className="fullscreen">
       <MyNavbar />
       <main>
-      <Customerbanner />
+        <Customerbanner />
 
-      <div className="d-lg-flex justify-content-around p-2 ps-lg-5 pe-lg-5">
-        <div className="col-lg-3 col-xs-12 col-md-12 p-lg-4 p-2">
-          <Customermenu />
+        <div className="d-lg-flex justify-content-around p-2 ps-lg-5 pe-lg-5">
+          <div className="col-lg-3 col-xs-12 col-md-12 p-lg-4 p-2">
+            <Customermenu />
+          </div>
+
+          <div className="col-xs-12 col-md-12 col-lg-9 p-lg-4 p-2">
+            {filteredProducts.length > 0 ? (
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Total Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product, index) => (
+                    <tr key={index}>
+                      <td>
+                        <img
+                          src={`${process.env.REACT_APP_HOST}${
+                            process.env.REACT_APP_PORT
+                          }/images/${JSON.parse(product.image)[0]}`}
+                          alt={product.name}
+                          style={{ maxWidth: "60px", maxHeight: "100px" }}
+                        />
+                      </td>
+                      <td className="text-secondary">{product.name}</td>
+                      <td>{product.price}</td>
+                      <td>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() =>
+                            handlecancel(product.id, product.quantity + 1)
+                          }
+                        >
+                          Cancel
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No orders</p>
+            )}
+          </div>
         </div>
-
-        <div className="col-xs-12 col-md-12 col-lg-9 p-lg-4 p-2">
-  {filteredProducts.length > 0 ? (
-    <table className="table table-hover">
-      <thead>
-        <tr>
-          <th>Product Image</th>
-          <th>Product Name</th>
-          <th>Total Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredProducts.map((product, index) => (
-          <tr key={index}>
-            <td>
-              <img
-                src={`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/images/${JSON.parse(product.image)[0]}`}
-                alt={product.name}
-                style={{ maxWidth: "60px", maxHeight: "100px" }}
-              />
-            </td>
-            <td className="text-secondary">{product.name}</td>
-            <td>{product.price}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  ) : (
-    <p>No orders</p>
-  )}
-</div>
-
-
-      </div>
       </main>
       <Footer />
     </div>

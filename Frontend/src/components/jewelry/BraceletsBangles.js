@@ -9,6 +9,7 @@ import Pagination from "../pagination";
 import Footer from "../footer";
 
 const BraceletsBangles = () => {
+    // eslint-disable-next-line no-unused-vars
   const [products, setProducts] = useState([]);
   const [pageSize, setPageSize] = useState(6);
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +25,6 @@ const BraceletsBangles = () => {
           const filterProducts = res.data.filter(
             (item) => item.category === "Bracelets/Bangles"
           );
-          setProducts(filterProducts);
           setFilteredProducts(filterProducts);
         }
       })

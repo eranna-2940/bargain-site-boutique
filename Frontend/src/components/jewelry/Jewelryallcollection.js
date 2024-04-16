@@ -12,6 +12,8 @@ const Jewelryallcollection = () => {
   const [products, setProducts] = useState([]);
   const [pageSize, setPageSize] = useState(6);
   const [currentPage, setCurrentPage] = useState(1);
+    // eslint-disable-next-line no-unused-vars
+  const [filteredProducts,setFilteredProducts]= useState([])
   // eslint-disable-next-line no-unused-vars
   const [viewRowIndex, setViewRowIndex] = useState(null);
   useEffect(() => {
@@ -20,6 +22,7 @@ const Jewelryallcollection = () => {
       .then((res) => {
         if (res.data !== "Fail" && res.data !== "Error") {
           setProducts(res.data);
+          setFilteredProducts(res.data)
         }
       })
       .catch((err) => console.log(err));

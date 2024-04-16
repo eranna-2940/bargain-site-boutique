@@ -3,7 +3,7 @@ import MyNavbar from "./navbar";
 import Footer from "./footer";
 import Curosel from "./curosal";
 import CarouselComponent from "./carouselcomponent";
-import axios from "axios";
+import axios  from "axios";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import Product from "./Product";
@@ -42,9 +42,7 @@ const Home = () => {
         console.log("Error fetching data:", error);
       });
   }, []);
-
-  // console.log(allProducts);
-
+  
   return (
     <div className="fullscreen">
       <MyNavbar />

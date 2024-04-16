@@ -8,10 +8,11 @@ import axios from "axios";
 export default function Changepassword() {
 
   const [userdetails,setUserDetails]= useState([])
+  const [admindetails,setAdminDetails]=useState([])
   const [values,setValues]= useState({
      oldpassword:'',
      newpassword:'',
-     confirmpassword:''
+     confirmpassword:'',
   })
 
   const handlechange = (event) => {
@@ -34,28 +35,75 @@ export default function Changepassword() {
         console.log("Error fetching all products:", error);
       });
     },[])
-
-    const handleChangePassword = () => {
-        if (values.oldpassword === userdetails[0].password) {
-        if (values.newpassword === values.confirmpassword) {
-          const updatedUser = {email:userdetails[0].email, password: values.newpassword };
-          axios
-            .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/updateuser/`, updatedUser)
-            .then((res) => {
-              alert("Password updated successfully:", res.data);
-              window.location.reload(false);
-              // Optionally, you can clear the input fields or show a success message here
-            })
-            .catch((error) => {
-              console.log("Error updating password:", error);
-            });
-        } else {
-          console.log("Passwords do not match.");
+    useEffect(() => {
+      // Fetch all products
+      axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/admin`)
+        .then((res) => {
+          if (res.data !== "Fail" && res.data !== "Error") {
+            setAdminDetails(res.data)
+            console.log(res.data)
+          }
+        })
+        .catch((error) => {
+          console.log("Error fetching all products:", error);
+        });
+      },[])
+  
+      const handleChangePassword = () => {
+        // Check the selected login type and set the URL accordingly
+        const user = sessionStorage.getItem("token");
+        let url = "";
+        let updatedUser = null;
+        let updatedAdmin = null;
+      
+        if (user === "user") {
+          url = "updateuser";
+          updatedUser = {
+            email: userdetails[0].email,
+            password: values.newpassword
+          };
+        } else if (user === "admin") {
+          url = "updateadmin";
+          updatedAdmin = {
+            email: admindetails[0].email,
+            password: values.newpassword
+          };
         }
-      } else {
-        console.log("Old password is incorrect.");
-      }
-    };
+      
+        if (!updatedUser && !updatedAdmin) {
+          console.log("Invalid user type.");
+          return;
+        }
+      
+        if (user === "user" && values.oldpassword !== userdetails[0].password) {
+          console.log("Old password is incorrect.");
+          return;
+        }
+      
+        if (user === "admin" && values.oldpassword !== admindetails[0].password) {
+          console.log("Old password is incorrect.");
+          return;
+        }
+      
+        if (values.newpassword !== values.confirmpassword) {
+          console.log("Passwords do not match.");
+          return;
+        }
+      
+        const updatedData = updatedUser ? updatedUser : updatedAdmin;
+      
+        axios
+          .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/${url}/`, updatedData)
+          .then((res) => {
+            alert(`${user}Password updated successfully`);
+            window.location.reload(false);
+          })
+          .catch((error) => {
+            console.log("Error updating password:", error);
+          });
+      };
+      
+      
 
   return (
     <div className="fullscreen">

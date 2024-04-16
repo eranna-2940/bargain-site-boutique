@@ -49,7 +49,11 @@ const {
   ordersproducts,
   deletecartitemQuery,
   getbillingAddress,
-  getshippingAddress
+  getshippingAddress,
+  retrievingAdminQuery,
+  udpateAdminQuery,
+  deleteOrderItemsQuery,
+  updatequantityQuery
 } = require("./queries");
 const cors = require("cors");
 const multer = require('multer');
@@ -213,7 +217,19 @@ app.post("/admin", (req, res) => {
     }
   });
 });
-
+app.get("/admin", (req, res) => {
+  const sql = retrievingAdminQuery;
+  db.query(sql, (err, data) => {
+    if (err) {
+      return res.json("Error");
+    }
+    if (data.length > 0) {
+      return res.json(data);
+    } else {
+      return res.json("Fail");
+    }
+  });
+});
 app.get("/user", (req, res) => {
   const sql = retrievingUsersQuery;
   db.query(sql, (err, data) => {
@@ -243,6 +259,21 @@ app.post("/register", (req, res) => {
 
 
 
+app.post("/updateadmin", (req, res) => {
+  const email = req.body.email;
+  const newData = req.body;
+  const sql = udpateAdminQuery;
+
+  db.query(sql, [newData, email], (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+    console.log("Data updated successfully");
+    return res.json(data);
+  });
+});
+
 app.post("/updateuser", (req, res) => {
   const email = req.body.email;
   const newData = req.body;
@@ -257,7 +288,6 @@ app.post("/updateuser", (req, res) => {
     return res.json(data);
   });
 });
-
 app.get("/selleraccount", (req, res) => {
   const sql = retrievingSellersQuery;
   db.query(sql, (err, data) => {
@@ -456,6 +486,7 @@ app.post("/addproducts",upload.array('images', 10), (req, res) => {
     req.body.size,
     req.body.measurements,
     req.body.worn,
+    req.body.quantity,
     req.body.price,
     req.body.Material,
     req.body.Occasion,
@@ -808,8 +839,47 @@ app.post("/updatepayment", (req, res) => {
   });
 });
 
+// app.post("/updatepayment", (req, res) => {
+//   const payment_status = req.body.payment_status;
+//   const token = parseInt(req.body.token); // Ensure that token is parsed as an integer
+//   const orderID = generateCustomID();
+
+//   // Insert into orders table
+//   const insertOrderSql = paymentStatusQuery;
+//   db.query(insertOrderSql, [req.body.product_id, payment_status, token, orderID], (err, result) => {
+//     if (err) {
+//       console.error("Error inserting into orders table:", err);
+//       return res.status(500).json({ error: "Error updating payment status" });
+//     }
+//     console.log("Payment status updated successfully for product with ID:", req.body.product_id);
+
+//     // Delete entries from cart table where userid matches buyer_id in orders table
+//        const deleteCartSql = deletecartitemQuery;
+//     db.query(deleteCartSql, [token, token], (err, deleteResult) => {
+//       if (err) {
+//         console.error("Error deleting from cart table:", err);
+//         return res.status(500).json({ error: "Error deleting cart items" });
+//       }
+//       console.log("Cart items removed successfully");
+//       // Delete product from products table if it exists in orders
+//       // const deleteProductSql = "DELETE FROM products WHERE id = ? AND EXISTS (SELECT 1 FROM orders WHERE product_id = ?)";
+//       // db.query(deleteProductSql, [req.body.product_id, req.body.product_id], (err, deleteProductResult) => {
+//       //   if (err) {
+//       //     console.error("Error deleting product from products table:", err);
+//       //     return res.status(500).json({ error: "Error deleting product" });
+//       //   }
+//       //   console.log("Product deleted from products table for product with ID:");
+
+//       //   // Respond with success message
+//       //   return res.status(200).json({ success: true, message: "Payment status updated, corresponding cart items deleted, and product deleted successfully" });
+//       // });
+//     });
+//   });
+// })
+
+
 app.get("/updatepayment", (req, res) => {
-  const sql = "Select * from orders";
+  const sql = "Select * from orders ";
 
   db.query(sql, (err, data) => {
     if (err) {
@@ -822,6 +892,38 @@ app.get("/updatepayment", (req, res) => {
     }
   });
 });
+// Assuming you are using Express
+// Assuming you are using Express
+// Assuming you are using Express
+app.post("/updateproducts", (req, res) => {
+  const { product_id, quantity } = req.body;
+  // Perform the update operation in the database
+  const sql = updatequantityQuery;
+  db.query(sql, [quantity,product_id], (err, result) => {
+    if (err) {
+      console.log("Error updating product quantity:", err);
+      return res.status(500).json({ success: false, error: "Failed to update product quantity" });
+    }
+    console.log('product quantity updated ')
+    return res.status(200).json({ success: true, message: "Product quantity updated successfully" });
+  });
+});
+
+app.delete("/updateorder/:id", (req, res) => {
+  const productId = req.params.id;
+    const orderID = req.body.userID;
+  const query = deleteOrderItemsQuery;
+  // Execute the query with the provided product ID
+  db.query(query, [productId,orderID], (error, results) => {
+    if (error) {
+      console.error("Error deleting product: " + error.message);
+      res.status(500).send("Error deleting product");
+      return;
+    }
+    res.status(200).send("Product deleted successfully");
+  });
+});
+
 
 
 // payment

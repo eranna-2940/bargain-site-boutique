@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS products (
     alteration VARCHAR(45) NOT NULL,
     size VARCHAR(45) NOT NULL,
     measurements TINYTEXT NOT NULL,
+    quantity INT NOT Null,
     worn VARCHAR(255) NOT NULL,
     price INT NOT NULL,
     material VARCHAR(90) NULL,
@@ -182,8 +183,10 @@ CREATE TABLE IF NOT EXISTS shipping_address (
 const loginCheckQuery = "SELECT * FROM register WHERE `email` = ? AND `password` = ?";
 const adminLoginQuery = "SELECT * FROM admin WHERE `email` = ? AND `password` = ?";
 const retrievingUsersQuery = "SELECT * FROM register";
+const retrievingAdminQuery = "SELECT * FROM admin";
 const addUserQuery = "INSERT INTO register set ?";
 const updateUserQuery = "UPDATE register SET ? WHERE email = ?";
+const udpateAdminQuery = "UPDATE admin SET ? WHERE email = ?";
 const retrievingSellersQuery = "select * from selleraccount";
 const addingSellerAccountQuery = "INSERT INTO selleraccount SET ?";
 const adminAcceptedProductsQuery = "select * from products WHERE `accepted_by_admin` = (?)";
@@ -195,11 +198,13 @@ const retrievingWomenProductsQuery = "select * from products WHERE `product_type
 const retrievingKidsProductsQuery = "select * from products WHERE `product_type` = (?) AND `accepted_by_admin` = (?)";
 const retrievingJewelleryProductsQuery = "select * from products WHERE `product_type` = (?) AND `accepted_by_admin` = (?)";
 const retrievingBooksProductsQuery = "select * from products WHERE `product_type` = (?) AND `accepted_by_admin` = (?)";
-const addProductsQuery = "INSERT INTO products (`product_type`,`category`,`name`,`description`,`image`,`location`,`color`,`alteration`,`size`,`measurements`,`worn`,`price`,`material`,`occasion`,`type`,`brand`,`product_condition`,`style`,`season`,`fit`,`length`,`accepted_by_admin`,`seller_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+const addProductsQuery = "INSERT INTO products (`product_type`,`category`,`name`,`description`,`image`,`location`,`color`,`alteration`,`size`,`measurements`,`worn`,`quantity`,`price`,`material`,`occasion`,`type`,`brand`,`product_condition`,`style`,`season`,`fit`,`length`,`accepted_by_admin`,`seller_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 const addToCartQuery = "INSERT INTO cart (`product_id`, `product_type`, `category`, `name`, `image`, `description`, `location`, `color`, `alteration`, `size`, `measurements`, `worn`, `price`, `accepted_by_admin`, `seller_id`, `userid`) values (?)";
 const retrievingCartItemsQuery = "select * from cart";
 const updateCartItemsQuery = "UPDATE cart SET userid = ? WHERE id = ?";
 const deleteCartItemsQuery = "DELETE FROM cart WHERE id = ?";
+const updatequantityQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+const deleteOrderItemsQuery = "DELETE FROM orders WHERE product_id = ? and buyer_id = ?"
 const addToWishlistQuery = "INSERT INTO wish (`product_id`, `product_type`, `category`, `name`, `image`, `description`, `location`, `color`, `alteration`, `size`, `measurements`, `worn`, `price`, `accepted_by_admin`, `seller_id`, `userid`) values (?)";
 const retrievingWishlistItemsQuery = "select * from wish";
 const deleteWishlistItemsQuery = "DELETE FROM wish WHERE id = ?";
@@ -210,6 +215,7 @@ const addShippingAddress = `INSERT INTO shipping_address (firstname, lastname, e
 const paymentStatusQuery = "INSERT INTO orders (product_id, payment_status, buyer_id, orderID) VALUES (?, ?, ?,?)";
 const deleteProductsQuery = "DELETE FROM  products WHERE id=?";
 const deletecartitemQuery = "DELETE FROM cart WHERE userid = ? AND EXISTS (SELECT 1 FROM orders WHERE buyer_id = ?)"
+// const deleteproductitemQuery="DELETE FROM products WHERE id = ? AND EXISTS (SELECT 1 FROM orders WHERE product_id = ?)"
 const getbillingAddress= "Select * from billing_address"
 const getshippingAddress= "Select * from shipping_address"
 // const cartpaymentupdateQuery = "UPDATE cart SET payment_status = ?, buyer_id = ? WHERE id = ?";
@@ -261,5 +267,9 @@ module.exports = {
   ordersproducts,
   deletecartitemQuery,
   getbillingAddress,
-  getshippingAddress
+  getshippingAddress,
+  retrievingAdminQuery,
+  udpateAdminQuery,
+  deleteOrderItemsQuery,
+  updatequantityQuery
 };

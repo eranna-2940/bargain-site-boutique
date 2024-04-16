@@ -321,7 +321,8 @@ const firstImage = datta[0];
             <p className="text-success fs-4">
               <b>&#8377;{productdetails.price}.00</b>
             </p>
-            {admin !== "admin" ? (
+            {productdetails.quantity > 0 ? (
+           admin !== "admin" ? (
               <>
                 <div className="d-flex">
                   <b> QTY </b>: &nbsp;
@@ -363,7 +364,8 @@ const firstImage = datta[0];
                 Reject
               </button>
               </>
-            )}
+            )
+            ):(<><h5 className="text-danger" style={{fontWeight:'800'}}>Out of Stock</h5></>)}
           </div>
         </div>
       </main>

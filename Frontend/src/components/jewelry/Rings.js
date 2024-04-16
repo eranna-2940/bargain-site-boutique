@@ -24,7 +24,7 @@ const Rings = () => {
           const filterProducts = res.data.filter(
             (item) => item.category === "Rings"
           );
-          setProducts(filterProducts);
+          setProducts(filterProducts)
           setFilteredProducts(filterProducts);
         }
       })

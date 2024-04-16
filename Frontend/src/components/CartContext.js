@@ -27,21 +27,27 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, from) => {
     const isProductInCart = cartItems.some(item => item.product_id === product.product_id);
+    const  Userproduct = product.seller_id.toString() === sessionStorage.getItem("user-token")
+
     if (isProductInCart) {
       alert("Product already exists in the cart");
-    } else {
-    axios
-      .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/addcart`,{ product, from })
-      .then((response) => {
-        setCartItems((prevItems) => [...prevItems, { ...product }]);
-      })
-      .catch((error) => {
-        console.error("Error adding to cart:", error);
-      });
-    alert("Product added to cart");
-    window.location.reload(false);
+    }else if(Userproduct){
+      alert("You Seller of this product")
     }
+     else {
+        axios
+          .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/addcart`, { product, from })
+          .then((response) => {
+            setCartItems((prevItems) => [...prevItems, { ...product }]);
+            alert("Product added to cart");
+          })
+          .catch((error) => {
+            console.error("Error adding to cart:", error);
+          });
+      } 
+    window.location.reload(false);
   };
+  
 
   const removeFromCart = (productId) => {
     axios
@@ -97,7 +103,11 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const addToWishlist = (product) => {
-    axios
+    const  Userproduct = product.seller_id.toString() === sessionStorage.getItem("user-token")
+     if(Userproduct){
+        alert('You Seller of this product')
+     }else{
+      axios
       .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/addwishlist`, product)
       .then((response) => {
         setWishItems((prevItems) => [...prevItems, product]);
@@ -107,6 +117,8 @@ export const CartProvider = ({ children }) => {
       });
     alert("Product added to wishlist");
     window.location.reload(false);
+     }
+    
   };
 
   const removeFromWishlist = (productId) => {
@@ -164,7 +176,7 @@ export const CartProvider = ({ children }) => {
         shippingAddressData,
         setShippingAddressData,
         billingAddressData,
-        setBillingAddressData
+        setBillingAddressData,
       }}
     >
       {children}
