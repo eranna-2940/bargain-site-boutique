@@ -41,8 +41,7 @@ export default function Sellerproducts() {
       .then((res) => {
         console.log(res.data);
         if (res.data !== "Fail" && res.data !== "Error") {
-            const rejectedProducts = res.data.filter(item => item.rejectedReason !== null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
-
+          const rejectedProducts = res.data.filter(item => item.rejectedReason !== null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);
           const approvedProducts = res.data.filter(item => item.accepted_by_admin === "true" && item.seller_id.toString() === userid);
            
           const pendingProducts = res.data.filter(item =>item.rejectedReason === null && item.accepted_by_admin === "false" && item.seller_id.toString() === userid);

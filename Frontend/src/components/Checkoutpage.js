@@ -458,7 +458,7 @@ const Checkout = () => {
                 <button className="btn btn-secondary mt-3" onClick={handleBack}>
                 <i class="bi bi-arrow-left-square"></i> Back
         </button>
-        <button className="btn btn-primary mt-3 me-3" onClick={handleClick}>
+        <button className="btn btn-primary mt-3 me-3" onClick={handleContinue}>
           <i className="bi bi-arrow-right-square me-1"></i>
           Continue
         </button>

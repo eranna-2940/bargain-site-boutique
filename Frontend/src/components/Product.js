@@ -38,9 +38,7 @@ const Product = (props) => {
     if (isProductInWishlist) {
         alert("Product already exists in the wishlist");
         return; // Exit the function early
-    }
-
-    if (isLoggedIn) {
+    }else if (isLoggedIn) {
         addToWishlist(props.product);
     } else {
         navigate("/login");
@@ -51,9 +49,11 @@ const Product = (props) => {
     const isProductInCart = cartItems.some(item => item.product_id === props.product.id);
     if (isProductInCart) {
       alert("Product already exists in the cart");
-    } else {
+    } else if(isLoggedIn) {
       addToCart(props.product,"main");
       console.log("Product added to cart:", props.product); // Add this line for debugging
+    }else{
+      navigate("/login")
     }
 };
   const datta = JSON.parse(props.product.image)

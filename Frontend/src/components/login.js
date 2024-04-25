@@ -7,7 +7,8 @@ import { useData } from "./CartContext";
 
 const Login = () => {
   sessionStorage.clear();
-  const { setUserData, cartItems} = useData();
+      // eslint-disable-next-line no-unused-vars
+  const { setUserData, cartItems,removeFromCart} = useData();
   // eslint-disable-next-line no-unused-vars
   const [values, setValues] = useState({
     username: "",
@@ -25,7 +26,7 @@ const Login = () => {
   };
 
   const navigate = useNavigate();
-
+    // eslint-disable-next-line no-unused-vars
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ const Login = () => {
         console.log("Error fetching data:", error);
       });
   }, []);
+    // eslint-disable-next-line no-unused-vars
   const [cartproducts,setCartProducts]=useState([])
   useEffect(() => {
     axios
@@ -54,67 +56,77 @@ const Login = () => {
       });
   }, []);
 //  console.log(cartproducts)
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    var url = "";
-    if (values.selectedlogin.toString() === "customer") {
-      url = "user";
-    } else if (values.selectedlogin.toString() === "admin") {
-      url = "admin";
-    }
-    axios
-      .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/${url}`, values)
-      .then((res) => {
-        if (res.data !== "Fail" && res.data !== "Error") {
-          const data = res.data[0];
-          setUserData(data);
-          var token;
-          if (url === 'user') {
-            token = data.user_id;
-            sessionStorage.setItem("token", "user");
-
-          } else if (url === 'admin') {
-            token = data.admin_id;
-            sessionStorage.setItem("token", "admin");
-          }
-          if (!token) {
-            alert("Unable to login. Please try after some time.");
-            return;
-          }
-          sessionStorage.removeItem("user-token");
-          sessionStorage.setItem("user-token", token);
-          const filtered = cartItems.map((item)=>item.seller_id)
-          const isProductInCart = cartItems.length > 0 && cartproducts.some(item => {
-            // Check if the product exists in the cart with the same userid
-            if (sessionStorage.getItem('user-token')) {
-                return allProducts.some(product => product.id === item.product_id && item.userid && item.userid.toString() === sessionStorage.getItem('user-token'));
-            } else {
-                // Allow updating the cart only if the product does not already exist
-                return !allProducts.some(product => product.id === item.product_id && item.userid !== null);
-            }
-        });
-        // console.log(isProductInCart)
-        if (filtered.toString()=== sessionStorage.getItem("user-token")) {
-            alert('You are the seller of this product');
-          }else if(isProductInCart){
-            alert('product already exist in your cart')
-          } else {
-            axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/editcart`, { cartItems, token: sessionStorage.getItem("user-token") })
-              .then((res) => {
-                console.log(res);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-              navigate("/");
-          }
-        } else {
-          alert("Invalid Username or Password");
-          window.location.reload(false);
+const handleSubmit = (e) => {
+  e.preventDefault();
+  var url = "";
+  if (values.selectedlogin.toString() === "customer") {
+    url = "user";
+  } else if (values.selectedlogin.toString() === "admin") {
+    url = "admin";
+  }
+  axios
+    .post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/${url}`, values)
+    .then((res) => {
+      if (res.data !== "Fail" && res.data !== "Error") {
+        const data = res.data[0];
+        setUserData(data);
+        var token;
+        if (url === 'user') {
+          token = data.user_id;
+          sessionStorage.setItem("token", "user");
+        } else if (url === 'admin') {
+          token = data.admin_id;
+          sessionStorage.setItem("token", "admin");
         }
-      })
-      .catch((err) => console.log(err));
-  };
+        if (!token) {
+          alert("Unable to login. Please try after some time.");
+          return;
+        }
+        sessionStorage.removeItem("user-token");
+        sessionStorage.setItem("user-token", token);
+
+        // const filtered = cartItems.map((item)=>item.seller_id)
+        // if (filtered.toString() === sessionStorage.getItem("user-token")) {
+        //   alert('You are the seller of this product');
+        //   // Replace 'filteredItemId' with the appropriate item ID from 'cartItems'
+        //   const filteredItemId = cartItems.find(item => item.seller_id === parseInt(sessionStorage.getItem("user-token"))).id;
+        //   removeFromCart(filteredItemId);
+        // } else {
+        //   const isProductInCart = cartItems.length > 0 && cartItems.some(item => {
+        //     if (sessionStorage.getItem('user-token')) {
+        //       return allProducts.some(product => product.id === item.product_id && item.userid && item.userid.toString() === sessionStorage.getItem('user-token'));
+        //     } else {
+        //       return !allProducts.some(product => product.id === item.product_id && item.userid !== null);
+        //     }
+        //   });
+
+        //   if (isProductInCart) {
+        //     alert('Product already exists in your cart');
+        //     // Replace 'productInCartItemId' with the appropriate item ID from 'cartItems'
+        //     const productInCartItemId = cartItems.find(item => {
+        //       // Replace 'productId' with the appropriate property from 'item' object
+        //       return allProducts.some(product => product.id === item.productId);
+        //     }).id;
+        //     removeFromCart(productInCartItemId);
+        //   } else {
+        //     axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/editcart`, { cartItems, token: sessionStorage.getItem("user-token") })
+        //       .then((res) => {
+        //         console.log(res);
+        //       })
+        //       .catch((err) => {
+        //         console.log(err);
+        //       });
+        //     navigate("/");
+        //   }
+        // }
+        navigate("/");
+      } else {
+        alert("Invalid Username or Password");
+        window.location.reload(false);
+      }
+    })
+    .catch((err) => console.log(err));
+};
 
   // console.log(cartItems)
   

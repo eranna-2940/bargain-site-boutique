@@ -15,7 +15,11 @@ export default function Sellerorders() {
   // eslint-disable-next-line no-unused-vars
   // eslint-disable-next-line no-unused-vars
   const [viewRowIndex, setViewRowIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [trackingNumber, setTrackingNumber] = useState('');
 
+  
   useEffect(() => {
     setCurrentPage(1);
     setViewRowIndex(null);
@@ -50,14 +54,34 @@ export default function Sellerorders() {
     axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/user`)
       .then((res) => {
         if (res.data !== "Fail" && res.data !== "Error") {
-          const userid = sessionStorage.getItem("user-token");
-          setUserDetails(res.data.filter((item)=>item.user_id.toString() === userid))
+          setUserDetails(res.data)
         }
       })
       .catch((error) => {
         console.log("Error fetching all products:", error);
       });
     },[])
+
+    const [trackdetails,setTrackDetails]= useState([])
+
+    useEffect(() => {
+      // Fetch tracking details
+      axios.get(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/tracking`)
+        .then((res) => {
+          if (res.data !== "Fail" && res.data !== "Error") {
+            // Filter tracking details based on current order IDs
+
+            setTrackDetails(res.data);
+          }
+        })
+        .catch((error) => {
+          console.log("Error fetching tracking details:", error);
+        });
+    // eslint-disable-next-line
+    }, []); // Run whenever trackingNumber state changes
+    
+    console.log(trackdetails)
+
   // const userId = parseInt(sessionStorage.getItem("user-token"));  
 
   // // Filter products that have orders
@@ -80,22 +104,32 @@ export default function Sellerorders() {
 // Filter products that have orders
 const filteredProducts = allProducts.map((product) => {
   // Find orders corresponding to the product
-  const productOrders = orders.filter((order) => order.product_id === product.id && order.buyer_id === userId);
-  
+  const productOrders = orders.filter((order) => order.product_id === product.id && product.seller_id === userId);
+ // Calculate Created on date based on available data
+
+
   // Map over product orders and create a new product object for each order
   const mappedProducts = productOrders.map((order) => {
     const userDetails = userdetails.find((user) => user.user_id === order.buyer_id);
+    const createdAt = new Date(order.createdAt);
+    const formattedDate = createdAt.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    });
     return { 
       ...product, 
       paymentStatus: order.payment_status,
       orderID: order.orderID,
-      customerName: userDetails ? userDetails.firstname + userDetails.lastname : ''
+      customerName: userDetails ? userDetails.firstname +" "+ userDetails.lastname : '',
+      createdOn: formattedDate,
     };
   });
 
   return mappedProducts;
 }).flat();
 
+console.log(orders)
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   // eslint-disable-next-line no-unused-vars
@@ -113,7 +147,25 @@ const filteredProducts = allProducts.map((product) => {
       }
     }
   };
-  
+  const handleViewOrderDetails = (index) => {
+    setSelectedOrderId(index);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleAddTracking = async (orderId) => {
+    try {
+      await axios.post(`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/orders/${orderId}/tracking`, { trackingNumber });
+      alert('Tracking information added successfully.');
+    } catch (error) {
+      console.error('Error adding tracking information:', error);
+      alert('Failed to add tracking information.');
+    }
+  };
+
   return (
     <div className="">
       <Sellernavbar />
@@ -234,18 +286,120 @@ const filteredProducts = allProducts.map((product) => {
                     <tbody>
                   {tableData.map((product, index) => (
                     <tr key={index}>
-                      <td></td>
+                      <td>
+                        <label className="pos-rel">
+                            <input
+                              type="checkbox"
+                              name="allcheckboxes"
+                              className="ace"
+                            />
+                            <span className="lbl"></span>
+                          </label>
+                          </td>
                       <td className="text-secondary">{product.name}</td>
                       <td>{product.paymentStatus ? <span className="text-success" style={{fontWeight:'600'}}>SUCCESS</span> : ""}</td>
                       <td>{product.customerName}</td>
-                      <td></td>
+                      <td>{product.createdOn}</td>
                       <td>{product.orderID}</td>
-                      <td></td>
-                      <td><button className="btn btn-success">view</button></td>
+                      {
+          trackdetails.length === 0 || !trackdetails.some(trackDetail => trackDetail.order_id === product.orderID) ? (
+    <>
+      <input 
+        type="text" 
+        value={trackingNumber} 
+        onChange={(e) => setTrackingNumber(e.target.value)} 
+      />                
+      <button 
+        onClick={() => handleAddTracking(product.orderID)}
+      >
+        Add Tracking
+      </button>
+    </>
+  ) : (
+    <td>ADDED</td>
+  )
+}
+
+
+                        
+                          <td><button className="btn btn-success" 
+                     onClick={() => handleViewOrderDetails(index)}>view</button></td>
                     </tr>
                   ))}
                 </tbody>
                   </table>
+<>
+<>
+{showModal && (
+  <div className="modal" style={{ display: "block" }}>
+    <div className="modal-dialog">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Order Details</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={handleCloseModal}
+          ></button>
+        </div>
+        <div className="modal-body">
+  {/* Display selected order details */}
+  {selectedOrderId !== null && (
+    <table className="table table-bordered">
+      <tbody>
+        <tr>
+          <td>
+            <strong>Name:</strong>
+          </td>
+          <td>
+            {filteredProducts[selectedOrderId].name}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Order ID:</strong>
+          </td>
+          <td>
+            {filteredProducts[selectedOrderId].orderID}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Image:</strong>
+          </td>
+          <td>
+            <img
+              src={`${process.env.REACT_APP_HOST}${process.env.REACT_APP_PORT}/images/${JSON.parse(filteredProducts[selectedOrderId].image)[0]}`}
+              alt={filteredProducts[selectedOrderId].name}
+              style={{ maxWidth: "100px", maxHeight: "100px" }}
+            />
+          </td>
+        </tr>
+        {/* Add more details as needed */}
+      </tbody>
+    </table>
+  )}
+</div>
+
+
+
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleCloseModal}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+</>
+
+    
+</>
                 </div>
                 <Sellerpagination
                   stateData={filteredProducts}

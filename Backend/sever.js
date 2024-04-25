@@ -45,6 +45,7 @@ const {
   addBillingAddress,
   addShippingAddress,
   paymentStatusQuery,
+  tracking,
   // cartpaymentupdateQuery,
   ordersproducts,
   deletecartitemQuery,
@@ -175,8 +176,11 @@ db.query(createDatabaseQuery, (err) => {
                         if (err) throw err;
                       db.query(ordersproducts, (err) => {
                         if (err) throw err;
+                      db.query(tracking, (err) => {
+                        if (err) throw err;
                         console.log("Database and tables created successfully");
                       });
+                    });
                     });
                     });
                   });
@@ -801,7 +805,6 @@ const generateCustomID = () => {
 
   // Generate four random characters
 
-
   // Generate four random numbers
   for (let i = 0; i < 4; i++) {
     const randomIndex = Math.floor(Math.random() * numbers.length);
@@ -814,12 +817,17 @@ const generateCustomID = () => {
 
 app.post("/updatepayment", (req, res) => {
   const payment_status = req.body.payment_status;
-  const token = parseInt(req.body.token); // Ensure that token is parsed as an integer
+  const token = parseInt(req.body.token); 
   const orderID = generateCustomID();
+  const now = new Date();
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const day = String(now.getDate()).padStart(2, '0');
+const createdAt = `${year}-${month}-${day}`;
 
   // Insert into orders table
   const insertOrderSql = paymentStatusQuery;
-  db.query(insertOrderSql, [req.body.product_id,payment_status, token,orderID,], (err, result) => {
+  db.query(insertOrderSql, [req.body.product_id,payment_status, token,orderID,createdAt], (err, result) => {
     if (err) {
       console.error("Error inserting into orders table:", err);
       return res.status(500).json({ error: "Error updating payment status" });
@@ -892,6 +900,43 @@ app.get("/updatepayment", (req, res) => {
     }
   });
 });
+
+
+// POST /orders/:orderId/tracking
+app.post("/orders/:orderId/tracking", (req, res) => {
+  const orderId = req.params.orderId;
+  const trackingNumber = req.body.trackingNumber;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const DateShipped = `${year}-${month}-${day}`;
+  // Insert the tracking information into the database
+  const insertTrackingSql = "INSERT INTO order_tracking (order_id, tracking_number,dateshipped) VALUES (?, ?,?)";
+  db.query(insertTrackingSql, [orderId, trackingNumber,DateShipped], (err, result) => {
+    if (err) {
+      console.error("Error inserting tracking information:", err);
+      return res.status(500).json({ error: "Error adding tracking information" });
+    }
+    console.log("Tracking information added successfully for order:", orderId);
+    return res.status(200).json({ success: true, message: "Tracking information added successfully" });
+  });
+});
+app.get("/tracking", (req, res) => {
+  const sql = "Select * from order_tracking ";
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      return res.json("Error");
+    }
+    if (data.length > 0) {
+      return res.json(data);
+    } else {
+      return res.json("Fail");
+    }
+  });
+});
+
 // Assuming you are using Express
 // Assuming you are using Express
 // Assuming you are using Express

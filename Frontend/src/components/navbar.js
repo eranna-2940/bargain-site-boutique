@@ -327,24 +327,18 @@ const MyNavbar = () => {
                  {isLoggedIn && user.email==="admin@admin" ? (
                   null
                  ):(
-                  <button
-                    className="btn cartBtn "
-                  >
-                    <Link
-                      to="/cartitems"
-                      className="text-decoration-none text-dark"
-
-                    >
-                      <i className="bi bi-cart3 fs-4 position-relative" >
-                        {cartItems.length > 0 && (
-                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                            {cartItems.length}
-                            <span className="visually-hidden">unread messages</span>
-                          </span>
-                        )}
-                      </i>
-                    </Link>
-                  </button>
+                  <button className="btn cartBtn">
+      <Link to="/cartitems" className="text-decoration-none text-dark">
+        <i className="bi bi-cart3 fs-4 position-relative">
+          {cartItems.length > 0 && (
+            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+              {cartItems.length}
+              <span className="visually-hidden">unread messages</span>
+            </span>
+          )}
+        </i>
+      </Link>
+    </button>
                  )}
                   
                 </div>

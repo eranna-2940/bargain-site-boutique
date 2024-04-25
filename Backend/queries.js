@@ -179,7 +179,15 @@ CREATE TABLE IF NOT EXISTS shipping_address (
   user_id INT NULL
 );
 `;
-
+const tracking = `
+CREATE TABLE IF NOT EXISTS order_tracking (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id VARCHAR(10) NOT NULL,
+  tracking_number VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(orderID)
+);
+`
 const loginCheckQuery = "SELECT * FROM register WHERE `email` = ? AND `password` = ?";
 const adminLoginQuery = "SELECT * FROM admin WHERE `email` = ? AND `password` = ?";
 const retrievingUsersQuery = "SELECT * FROM register";
@@ -212,7 +220,7 @@ const retrieveContactusQuery = "Select * from contact";
 const addContactusQuery = "INSERT INTO contact (`name`,`email`,`enquiry`) VALUES(?)";
 const addBillingAddress = `INSERT INTO billing_address (firstname, lastname, email, country, state, city, address1, address2, pincode, phone, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 const addShippingAddress = `INSERT INTO shipping_address (firstname, lastname, email, country, state, city, address1, address2, pincode, phone, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-const paymentStatusQuery = "INSERT INTO orders (product_id, payment_status, buyer_id, orderID) VALUES (?, ?, ?,?)";
+const paymentStatusQuery = "INSERT INTO orders (product_id, payment_status, buyer_id, orderID,createdAt) VALUES (?, ?, ?,?,?)";
 const deleteProductsQuery = "DELETE FROM  products WHERE id=?";
 const deletecartitemQuery = "DELETE FROM cart WHERE userid = ? AND EXISTS (SELECT 1 FROM orders WHERE buyer_id = ?)"
 // const deleteproductitemQuery="DELETE FROM products WHERE id = ? AND EXISTS (SELECT 1 FROM orders WHERE product_id = ?)"
@@ -271,5 +279,6 @@ module.exports = {
   retrievingAdminQuery,
   udpateAdminQuery,
   deleteOrderItemsQuery,
-  updatequantityQuery
+  updatequantityQuery,
+  tracking
 };

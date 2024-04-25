@@ -29,7 +29,7 @@ const responsive = {
 export default function Productdetails() {
   const { id } = useParams();
   const location = useLocation();
-  const { productdetails, admin } = location.state;
+  const { productdetails, admin ,wishItems} = location.state;
   productdetails.userid = sessionStorage.getItem("user-token");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -79,32 +79,56 @@ export default function Productdetails() {
 
   const { addToCart, addToWishlist, cartItems } = useCart();
 
-  const handleAddToCart = () => {
-    if (cartItems.length > 0) {
-      var unique_item = true;
-      cartItems.map((item) => {
-        if (item.id === productdetails.id) {
-          alert("Product already exists in the cart");
-          unique_item = false;
-          //eslint-disable-next-line array-callback-return
-          return;
-        }
-        return null;
-      });
-      unique_item && addToCart(productdetails,"main");
-    } else {
-      addToCart(productdetails,"main");
-    }
-  };
+  // const handleAddToCart = () => {
+  //   if (cartItems.length > 0) {
+  //     var unique_item = true;
+  //     cartItems.map((item) => {
+  //       if (item.id === productdetails.id) {
+  //         alert("Product already exists in the cart");
+  //         unique_item = false;
+  //         //eslint-disable-next-line array-callback-return
+  //         return;
+  //       }
+  //       return null;
+  //     });
+  //     unique_item && addToCart(productdetails,"main");
+  //   } else {
+  //     addToCart(productdetails,"main");
+  //   }
+  // };
 
   
+  // const handleAddToWishlist = () => {
+  //   if (isLoggedIn) {
+  //     addToWishlist(productdetails);
+  //   } else {
+  //     navigate("/login");
+  //   }
+  // };
+
   const handleAddToWishlist = () => {
-    if (isLoggedIn) {
-      addToWishlist(productdetails);
+    const isProductInWishlist = wishItems.some(item => item.id === productdetails.id);
+    if (isProductInWishlist) {
+        alert("Product already exists in the wishlist");
+        return; // Exit the function early
+    }else if (isLoggedIn) {
+        addToWishlist(productdetails);
     } else {
-      navigate("/login");
+        navigate("/login");
     }
-  };
+};
+
+  const handleAddToCart = () => {
+    const isProductInCart = cartItems.some(item => item.id === productdetails.id);
+    if (isProductInCart) {
+      alert("Product already exists in the cart");
+    } else if(isLoggedIn) {
+      addToCart(productdetails,"main");
+      console.log("Product added to cart:"); // Add this line for debugging
+    }else{
+      navigate("/login")
+    }
+};
 // useRef to hold the reference to the productdetailsimg
 const productDetailsImgRef = useRef();
 // useRef to hold the reference to the active subimage

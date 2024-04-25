@@ -68,7 +68,7 @@ function App() {
   useEffect(() => {
     checkUserToken();
   }, [isUserLoggedIn]);
-
+ 
   return (
     <>
       <BrowserRouter basename="bargain-site-boutique">
